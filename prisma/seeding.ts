@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
 
-prisma.$transaction(async(tx) => {
+void prisma.$transaction(async(tx) => {
   await tx.statistics.deleteMany();
 
   const players = getUniquePlayers(5000);

@@ -27,4 +27,4 @@ async function main(): Promise<void> {
   console.log(await getPlayerGlobalPosition(globalPlayer));
 }
 
-main().then(() => prisma.$disconnect());
+void main().then(() => prisma.$disconnect());

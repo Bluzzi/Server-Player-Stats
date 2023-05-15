@@ -8,7 +8,9 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "prisma db seed",
     "db:client": "prisma generate",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
     "@bluzzi/eslint-config": "^1.1.0",
@@ -25,7 +27,8 @@
   "eslintConfig": {
     "extends": "@bluzzi",
     "rules": {
-      "camelcase": "off"
+      "camelcase": "off",
+      "@typescript-eslint/explicit-function-return-type": "off"
     }
   },
   "prisma": {
