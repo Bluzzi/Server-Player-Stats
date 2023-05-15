@@ -3,31 +3,43 @@ import { faker } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
 
-async function main(): Promise<void> {
+prisma.$transaction(async(tx) => {
+  await tx.statistics.deleteMany();
+
+  const players = getUniquePlayers(5000);
+  const servers = getServers(20);
+
   const promises: Promise<unknown>[] = [];
 
-  await prisma.statistics.deleteMany();
-
-  for (let serverId = 0; serverId < 10; serverId++) {
-    const server = `server${serverId}`;
-
-    for (let i = 0; i < 100; i++) {
-      const player = `${faker.name.firstName()} ${faker.name.lastName()}`;
-
-      const create = prisma.statistics.create({
+  for (const server of servers) {
+    for (const player of players) {
+      const promise = tx.statistics.create({
         data: {
-          player: player,
           server: server,
-          xpCount: Math.floor(Math.random() * 10_000)
+          player: player,
+          xpCount: Math.floor(Math.random() * 1_000_000)
         }
       });
 
-      promises.push(create);
+      promises.push(promise);
     }
   }
 
-  // Await promises:
   await Promise.all(promises);
+}, { timeout: 100_000 }).then(() => prisma.$disconnect());
+
+export function getUniquePlayers(count: number): string[] {
+  const players: Set<string> = new Set();
+
+  while (players.size < count) players.add(`${faker.name.firstName()} ${faker.name.lastName()}`);
+
+  return [...players];
 }
 
-main().then(() => prisma.$disconnect());
+export function getServers(count: number): string[] {
+  const servers: string[] = [];
+
+  for (let id = 0; id < count; id++) servers.push(`server${id}`);
+
+  return servers;
+}
